@@ -1,0 +1,306 @@
+[8/14, 14:47] Sjkumar: <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriScan - Food Nutrition Analyzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="/static/images/logo.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="/static/images/logo.png" alt="NutriScan Logo" class="logo">
+            <h1>NutriScan</h1>
+            <p>AI-powered food nutrition analyzer</p>
+        </header>
+
+        <div class="upload-card">
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop food image or click to browse</p>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <div class="preview" id="previewContainer">
+                <img id="imagePreview">
+                <button id="removeBtn"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="health-options">
+                <label for="healthCondition">Health Condition:</label>
+                <select id="healthCondition">
+                    <option value="general">No specific condition</option>
+                    <option value="diabetes">Diabetes</option>
+                    <option value="hypertension">Hypertension</option>
+                    <option value="weightloss">Weight Loss</option>
+                </select>
+            </div>
+
+            <button id="analyzeBtn" class="btn-primary" disabled>
+                <i class="fas fa-search"></i> Analyze Food
+            </button>
+        </div>
+
+        <div class="results-card" id="resultsCard">
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p>Analyzing your food...</p>
+            </div>
+
+            <div class="results-content" id="resultsContent">
+                <h2 id="foodName"></h2>
+                <div class="nutrition-facts">
+                    <div class="fact">
+                        <i class="fas fa-fire"></i>
+                        <span id="calories">--</span>
+                        <small>Calories</small>
+                    </div>
+                    <div class="fact">
+                        <i class="fas fa-dumbbell"></i>
+                        <span id="protein">--</span>
+                        <small>Protein (g)</small>
+                    </div>
+                    <div class="fact">
+                        <i class="fas fa-bread-slice"></i>
+                        <span id="carbs">--</span>
+                        <small>Carbs (g)</small>
+                    </div>
+                    <div class="fact">
+                        <i class="fas fa-oil-can"></i>
+                        <span id="fat">--</span>
+                        <small>Fat (g)</small>
+                    </div>
+                </div>
+
+                <div class="recommendations">
+                    <h3><i class="fas fa-heartbeat"></i> Health Recommendations</h3>
+                    <ul id="recommendationsList"></ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>NutriScan | AI Food Nutrition Analyzer</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
+[8/14, 14:47] Sjkumar: :root {
+    --primary: #4CAF50;
+    --primary-light: #81C784;
+    --secondary: #FF9800;
+    --secondary-light: #FFB74D;
+    --dark: #263238;
+    --light: #f9f9f9;
+    --danger: #F44336;
+    --gray: #e0e0e0;
+    --background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+body {
+    background: var(--background);
+    min-height: 100vh;
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+/* Updated upload card with glassmorphism effect */
+.upload-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Enhanced nutrition facts cards */
+.nutrition-facts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.fact {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.fact:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Color-coded nutrition icons */
+.fact:nth-child(1) i { color: var(--primary); } /* Calories */
+.fact:nth-child(2) i { color: #2196F3; }       /* Protein */
+.fact:nth-child(3) i { color: #FF5722; }       /* Carbs */
+.fact:nth-child(4) i { color: #9C27B0; }       /* Fat */
+
+/* Modern button styles */
+.btn-primary {
+    background: linear-gradient(to right, var(--primary), var(--primary-light));
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(76, 175, 80, 0.2);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(to right, #3e8e41, #66BB6A);
+    box-shadow: 0 6px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Enhanced results card */
+.results-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Recommendations with color accents */
+.recommendations {
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(129, 199, 132, 0.1));
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+}
+
+.recommendations h3 {
+    color: var(--dark);
+    margin-bottom: 15px;
+}
+
+.recommendations li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .nutrition-facts {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .nutrition-facts {
+        grid-template-columns: 1fr;
+    }
+    
+    .fact {
+        padding: 15px;
+    }
+}
+[8/14, 14:47] Sjkumar: document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const resultsCard = document.getElementById('resultsCard');
+    const foodName = document.getElementById('foodName');
+    const calories = document.getElementById('calories');
+    const protein = document.getElementById('protein');
+    const carbs = document.getElementById('carbs');
+    const fat = document.getElementById('fat');
+    const previewContainer = document.getElementById('previewContainer');
+    const removeBtn = document.getElementById('removeBtn');
+    const recommendationsList = document.getElementById('recommendationsList');
+
+    // Handle file selection
+    uploadArea.addEventListener('click', () => fileInput.click());
+    
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('imagePreview').src = event.target.result;
+                previewContainer.style.display = 'block';
+                analyzeBtn.disabled = false;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    // Remove image
+    removeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        fileInput.value = '';
+        previewContainer.style.display = 'none';
+        analyzeBtn.disabled = true;
+    });
+
+    // Analyze button click
+    analyzeBtn.addEventListener('click', async function() {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('healthCondition', document.getElementById('healthCondition').value);
+
+        // Show loading
+        resultsCard.style.display = 'block';
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('resultsContent').style.display = 'none';
+
+        try {
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            // Display results
+            foodName.textContent = data.food || 'Unknown Food';
+            calories.textContent = data.calories || '--';
+            protein.textContent = data.protein || '--';
+            carbs.textContent = data.carbs || '--';
+            fat.textContent = data.fat || '--';
+
+            // Display recommendations
+            if (data.recommendations) {
+                recommendationsList.innerHTML = data.recommendations
+                    .map(rec => `<li><i class="fas fa-check-circle"></i>${rec}</li>`)
+                    .join('');
+            }
+
+            // Hide loader
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'block';
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Analysis failed: ' + error.message);
+            document.getElementById('loader').style.display = 'none';
+        }
+    });
+});
